@@ -16,7 +16,7 @@ public class GeneticFunctions {
         double[][] population = new double[populationSize][chromosomeSize];
         for (int i = 0; i < populationSize; i++) {
             for (int j = 0; j < chromosomeSize; j++) {
-                population[i][j] = Math.random() * 30 - 15;
+                population[i][j] = (Math.random() * 30) - 15;
             }
         }
 
