@@ -4,13 +4,11 @@ public class GeneticFunctions {
     private int a;
     private double b;
     private double c;
-    private double d;
 
     public GeneticFunctions() {
         this.a = 20;
         this.b = 0.2;
         this.c = 2 * Math.PI;
-        this.d = 30;
     }
 
     // Generate population for ackley function
@@ -29,85 +27,81 @@ public class GeneticFunctions {
     public double calculateFitness(double[] x) {
         double sum1 = 0;
         double sum2 = 0;
+        int d = x.length;
 
         for (int i = 0; i < d; i++) {
             sum1 += Math.pow(x[i], 2);
             sum2 += Math.cos(c * x[i]);
         }
+        double term1 = -a * Math.exp(-b * Math.sqrt(sum1 / d));
+        double term2 = -Math.exp(sum2 / d);
 
-        return -a * Math.exp(-b * Math.sqrt(sum1 / d)) - Math.exp(sum2 / d) + a + Math.exp(1);
+        return term1 + term2 + a + Math.exp(1);
     }
 
-    // Sort population by fitness
+    // Sort population by fitness using selection sort
     public double[][] sortPopulation(double[][] population) {
-        double[][] sortedPopulation = new double[population.length][population[0].length];
-
-        for (int i = 0; i < population.length; i++) {
-            double[] individual = population[i];
-            double fitness = calculateFitness(individual);
-
-            for (int j = 0; j < population.length; j++) {
-                if (calculateFitness(sortedPopulation[j]) < fitness) {
-                    double[] temp = sortedPopulation[j];
-                    sortedPopulation[j] = individual;
-                    individual = temp;
+        for (int i = 0; i < population.length - 1; i++) {
+            int minIndex = i;
+            for (int j = i + 1; j < population.length; j++) {
+                double fitness1 = calculateFitness(population[j]);
+                double fitness2 = calculateFitness(population[minIndex]);
+                if (fitness1 < fitness2) {
+                    minIndex = j;
                 }
+            }
+
+            if (minIndex != i) {
+                double[] temp = population[i];
+                population[i] = population[minIndex];
+                population[minIndex] = temp;
             }
         }
 
-        return sortedPopulation;
+        return population;
     }
 
     // Select two parents by roulette wheel selection
     public double[][] selectParents(double[][] population) {
-        double[][] parents = new double[2][population[0].length];
+        double[][] parents = new double[10][population[0].length];
         double totalFitness = 0;
 
         for (int i = 0; i < population.length; i++) {
             totalFitness += calculateFitness(population[i]);
         }
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 10; i++) {
             double random = Math.random() * totalFitness;
-            double sum = 0;
 
             for (int j = 0; j < population.length; j++) {
-                sum += calculateFitness(population[j]);
-                if (sum >= random) {
+                if (calculateFitness(population[j]) >= random) {
                     parents[i] = population[j];
                     break;
                 }
             }
         }
 
-        return parents;
+        // Get two best parents
+        double[][] bestParents = this.sortPopulation(parents);
+        bestParents[0] = parents[0];
+        bestParents[1] = parents[1];
+
+        return bestParents;
     }
 
     // Crossover
     public double[][] crossover(double[][] parents) {
         double[][] children = new double[2][parents[0].length];
-        double[][] parentsCopy = new double[2][parents[0].length];
+        int crossoverPoint = (int) (Math.random() * (parents[0].length - 1)) + 1;
 
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < parents[0].length; j++) {
-                parentsCopy[i][j] = parents[i][j];
-            }
+        for (int i = 0; i < crossoverPoint; i++) {
+            children[0][i] = parents[0][i];
+            children[1][i] = parents[1][i];
         }
 
-        for (int i = 0; i < 2; i++) {
-            double[] parent1 = parentsCopy[0];
-            double[] parent2 = parentsCopy[1];
-            double[] child = new double[parents[0].length];
-
-            for (int j = 0; j < child.length; j++) {
-                if (Math.random() < 0.5) {
-                    child[j] = parent1[j];
-                } else {
-                    child[j] = parent2[j];
-                }
-            }
-
-            children[i] = child;
+        for (int i = crossoverPoint; i < parents[0].length; i++) {
+            children[0][i] = parents[1][i];
+            children[1][i] = parents[0][i];
         }
 
         return children;
@@ -117,7 +111,7 @@ public class GeneticFunctions {
     public double[][] mutate(double[][] children) {
         for (int i = 0; i < children.length; i++) {
             for (int j = 0; j < children[0].length; j++) {
-                if (Math.random() < 0.1) {
+                if (Math.random() < 0.4) {
                     children[i][j] = Math.random() * 30 - 15;
                 }
             }
@@ -128,7 +122,9 @@ public class GeneticFunctions {
 
     public double[][] replaceWorstIndividuals(double[][] population, double[][] children) {
         for (int i = 0; i < children.length; i++) {
-            population[population.length - 1 - i] = children[i];
+            if (calculateFitness(children[i]) < calculateFitness(population[population.length - 1])) {
+                population[population.length - 1] = children[i];
+            }
         }
 
         return population;
