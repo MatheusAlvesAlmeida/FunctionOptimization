@@ -60,12 +60,8 @@ public class StrategyFunctions {
     }
 
     // Calculate new sigma based by the 1/5 rule
-    public double calculateSigma(double sigma, double[] x) {
-        double average = 0;
-        for (int i = 0; i < x.length; i++) {
-            average += x[i];
-        }
-        average /= x.length;
+    public double calculateSigma(double sigma, int acceptedMutations, int i) {
+        double average = acceptedMutations / i;
         if (average > 0.2) {
             return sigma * 1.2;
         } else if (average < 0.2) {
