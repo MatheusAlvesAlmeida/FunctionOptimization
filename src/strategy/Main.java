@@ -5,7 +5,7 @@ public class Main {
         StrategyFunctions strategyFunctions = new StrategyFunctions();
         double[] startPoint = strategyFunctions.createStartPoint();
         double sigma = 1.5;
-        int i = 0, acceptedMutations = 0;
+        int i = 1, acceptedMutations = 0;
         while (strategyFunctions.calculateFitness(startPoint) > 0.0001) {
             double[] Y = strategyFunctions.mutate(startPoint, sigma);
             if (strategyFunctions.calculateFitness(startPoint) > strategyFunctions.calculateFitness(Y)) {
