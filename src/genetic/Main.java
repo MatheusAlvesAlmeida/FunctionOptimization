@@ -1,11 +1,27 @@
 package genetic;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         GeneticFunctions geneticFunctions = new GeneticFunctions();
-        double[][] population = geneticFunctions.generatePopulation(300, 30);
+        double[][] population = geneticFunctions.generatePopulation(200, 30);
         int i = 1;
-        while (geneticFunctions.calculateFitness(population[0]) > 0.0001) {
+        try {
+            File myObj = new File("fitness.txt");
+            if (myObj.createNewFile()) {
+                System.out.println("File created: " + myObj.getName());
+            } else {
+                System.out.println("File already exists.");
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+        FileWriter writer = new FileWriter("fitness.txt");
+        while (geneticFunctions.calculateFitness(population[0]) > 0.001 && i < 200000) {
             System.out.println("\nGeneration " + i);
             population = geneticFunctions.sortPopulation(population);
             System.out.println();
@@ -17,15 +33,16 @@ public class Main {
             population = geneticFunctions.sortPopulation(population);
             population = geneticFunctions.replaceWorstIndividuals(population,
                     mutatedChildren);
-            // Print best individual and fitness
-            System.out.print("Best individual: ");
-            for (int j = 0; j < population[0].length; j++) {
-                System.out.print(population[0][j] + " ");
-            }
-            System.out.println();
-            System.out.println("Fitness: " +
+            System.out.println("Best fitness: " +
                     geneticFunctions.calculateFitness(population[0]));
+            try {
+                writer.write(geneticFunctions.calculateFitness(population[0]) + "\n");
+            } catch (IOException e) {
+                System.out.println("An error occurred.");
+                e.printStackTrace();
+            }
             i++;
         }
+        writer.close();
     }
 }

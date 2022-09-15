@@ -126,7 +126,6 @@ public class GeneticFunctions {
                 population[population.length - 1] = children[i];
             }
         }
-
         return population;
     }
 }
