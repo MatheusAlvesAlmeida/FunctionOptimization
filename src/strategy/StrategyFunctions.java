@@ -14,10 +14,11 @@ public class StrategyFunctions {
     }
 
     public double[] createStartPoint() {
-        double[] population = new double[30];
+        double[] population = new double[31];
         for (int i = 0; i < 30; i++) {
             population[i] = (Math.random() * 30) - 15;
         }
+        population[30] = 1.5;
         return population;
     }
 
@@ -36,39 +37,17 @@ public class StrategyFunctions {
         return term1 + term2 + a + Math.exp(1);
     }
 
-    public double[] calculateNormalDistribution(double[] x, double sigma) {
-        double[] Z = new double[x.length];
-        double normalization = 1 / (sigma * Math.sqrt(2 * Math.PI));
-        double averageDistribution = 0;
-        for (int i = 0; i < x.length; i++) {
-            averageDistribution += x[i];
+    public double[] mutate(double[] population) {
+        double[] Y = new double[31];
+        double newSigma = population[30] * Math.exp((Math.random() * 2 - 1) * (1 / Math.sqrt(2 * d)));
+        for (int i = 0; i < 30; i++) {
+            Y[i] = population[i] + ((Math.random() * 2 - 1) * newSigma);
         }
-        averageDistribution /= x.length;
-        for (int i = 0; i < x.length; i++) {
-            Z[i] = normalization * Math.exp(-Math.pow(x[i] - averageDistribution, 2) / (2 * Math.pow(sigma, 2)));
-        }
-        return Z;
-    }
-
-    public double[] mutate(double[] x, double sigma) {
-        double[] Z = calculateNormalDistribution(x, sigma);
-        double[] Y = new double[x.length];
-        for (int i = 0; i < x.length; i++) {
-            Y[i] = x[i] + Z[i];
+        if (newSigma > 0.001) {
+            Y[30] = newSigma;
+        } else {
+            Y[30] = 0.001;
         }
         return Y;
     }
-
-    // Calculate new sigma based by the 1/5 rule
-    public double calculateSigma(double sigma, int acceptedMutations, int i) {
-        double average = (double) acceptedMutations / i;
-        if (average > 0.2) {
-            return sigma * 0.8;
-        } else if (average < 0.2) {
-            return sigma * 1.2;
-        } else {
-            return sigma;
-        }
-    }
-
 }

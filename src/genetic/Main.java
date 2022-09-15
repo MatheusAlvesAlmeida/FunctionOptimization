@@ -9,18 +9,14 @@ public class Main {
             System.out.println("\nGeneration " + i);
             population = geneticFunctions.sortPopulation(population);
             System.out.println();
-            for (int j = 0; j < 2; j++) {
-                // Select parents for crossover
-                double[][] parents = geneticFunctions.selectParents(population);
-                double[][] children = geneticFunctions.crossover(parents);
-                double[][] mutatedChildren = geneticFunctions.mutate(children);
-                // Sort population and replace the worst 2 with the children
-                population = geneticFunctions.sortPopulation(population);
-                population = geneticFunctions.replaceWorstIndividuals(population,
-                        mutatedChildren);
-            }
-            // Sort population
+            // Select parents for crossover
+            double[][] parents = geneticFunctions.selectParents(population);
+            double[][] children = geneticFunctions.crossover(parents);
+            double[][] mutatedChildren = geneticFunctions.mutate(children);
+            // Sort population and replace the worst 2 with the children
             population = geneticFunctions.sortPopulation(population);
+            population = geneticFunctions.replaceWorstIndividuals(population,
+                    mutatedChildren);
             // Print best individual and fitness
             System.out.print("Best individual: ");
             for (int j = 0; j < population[0].length; j++) {
